@@ -24,10 +24,21 @@ class COS_UI(bpy.types.Panel):
         layout.prop(scene, 'sphere_scale')
         layout.prop(scene, 'sphere_radius')
         layout.prop(scene, 'focal')
-        layout.prop(scene, 'seed')
-
-        layout.prop(scene, 'cos_nb_frames')
-        layout.prop(scene, 'upper_views', toggle=True)
+        
+        layout.separator()
+        layout.label(text='Sampling Method')
+        layout.prop(scene, 'cos_use_spiral', toggle=True)
+        
+        if scene.cos_use_spiral:
+            layout.prop(scene, 'cos_nb_frames')
+            layout.prop(scene, 'cos_spiral_rotations')
+            layout.prop(scene, 'cos_spiral_up_var')
+            layout.prop(scene, 'upper_views', toggle=True)
+        else:
+            layout.prop(scene, 'seed')
+            layout.prop(scene, 'cos_nb_frames')
+            layout.prop(scene, 'upper_views', toggle=True)
+        
         layout.prop(scene, 'outwards', toggle=True)
 
         layout.use_property_split = False

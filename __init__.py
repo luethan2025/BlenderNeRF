@@ -61,6 +61,9 @@ PROPS = [
     ('show_camera', bpy.props.BoolProperty(name='Camera', description='Whether to show the training camera', default=False, update=helper.visualize_camera) ),
     ('upper_views', bpy.props.BoolProperty(name='Upper Views', description='Whether to sample views from the upper hemisphere of the training sphere only', default=False) ),
     ('outwards', bpy.props.BoolProperty(name='Outwards', description='Whether to point the camera outwards of the training sphere', default=False, update=helper.properties_ui_upd) ),
+    ('cos_use_spiral', bpy.props.BoolProperty(name='Use Spiral', description='Whether to use NeRF-style spiral sampling instead of random sphere sampling', default=True) ),
+    ('cos_spiral_rotations', bpy.props.FloatProperty(name='Rotations', description='Number of rotations around the center object in spiral trajectory', default=1.0, soft_min=0.1, soft_max=10.0) ),
+    ('cos_spiral_up_var', bpy.props.FloatProperty(name='Height Variation', description='Vertical height variation range in spiral trajectory (0 = no variation)', default=0.0, soft_min=0.0, soft_max=1.0) ),
 
     # cos automatic properties
     ('sphere_exists', bpy.props.BoolProperty(name='Sphere Exists', description='Whether the sphere exists', default=False) ),

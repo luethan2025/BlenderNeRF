@@ -121,8 +121,9 @@ class BlenderNeRF_Operator(bpy.types.Operator):
             filename = os.path.basename( scene.render.frame_path(frame=frame) )
             filedir = OUTPUT_TRAIN * (mode == 'TRAIN') + OUTPUT_TEST * (mode == 'TEST')
 
+            frame_filename = os.path.splitext(filename)[0] if scene.splats else filename
             frame_data = {
-                'file_path': os.path.join(filedir, os.path.splitext(filename)[0] if scene.splats else filename).replace('\\\\', '/'),
+                'file_path': os.path.join(filedir, frame_filename).replace('\\', '/'),
                 'transform_matrix': self.listify_matrix(camera.matrix_world)
             }
 

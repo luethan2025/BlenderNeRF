@@ -82,6 +82,7 @@ class CameraOnSphere(blender_nerf_operator.BlenderNeRF_Operator):
                 scene.rendering = (False, False, True)
                 scene.frame_end = scene.frame_start + scene.cos_nb_frames - 1 # update end frame
                 scene.render.filepath = os.path.join(output_train, '') # training frames path
+                scene.render.film_transparent = True # enable transparent background
                 bpy.ops.render.render('INVOKE_DEFAULT', animation=True, write_still=True) # render scene
 
         # if frames are rendered, the below code is executed by the handler function

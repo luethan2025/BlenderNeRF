@@ -83,6 +83,40 @@ def delete_camera(scene, name):
         if name in block.name:
             bpy.data.cameras.remove(block)
 
+# center crop using render border for COS output
+def set_center_crop(scene, crop_size=800):
+    scale = scene.render.resolution_percentage / 100
+    width = scene.render.resolution_x * scale
+    height = scene.render.resolution_y * scale
+
+    if width < crop_size or height < crop_size:
+        return False
+
+    scene.init_use_border = scene.render.use_border
+    scene.init_use_crop_to_border = scene.render.use_crop_to_border
+    scene.init_border_min_x = scene.render.border_min_x
+    scene.init_border_max_x = scene.render.border_max_x
+    scene.init_border_min_y = scene.render.border_min_y
+    scene.init_border_max_y = scene.render.border_max_y
+
+    scene.render.use_border = True
+    scene.render.use_crop_to_border = True
+    scene.render.border_min_x = 0.5 - (crop_size / width) / 2
+    scene.render.border_max_x = 0.5 + (crop_size / width) / 2
+    scene.render.border_min_y = 0.5 - (crop_size / height) / 2
+    scene.render.border_max_y = 0.5 + (crop_size / height) / 2
+
+    return True
+
+
+def restore_center_crop(scene):
+    scene.render.use_border = scene.init_use_border
+    scene.render.use_crop_to_border = scene.init_use_crop_to_border
+    scene.render.border_min_x = scene.init_border_min_x
+    scene.render.border_max_x = scene.init_border_max_x
+    scene.render.border_min_y = scene.init_border_min_y
+    scene.render.border_max_y = scene.init_border_max_y
+
 # NeRF-style spiral sampling or non-uniform random sampling
 def sample_from_sphere(scene):
     if scene.cos_use_spiral:
@@ -235,6 +269,7 @@ def post_render(scene):
             scene.frame_end = scene.init_frame_end
 
         if scene.rendering[2]: # cos : reset camera settings
+            restore_center_crop(scene)
             if not scene.init_camera_exists: delete_camera(scene, CAMERA_NAME)
             if not scene.init_sphere_exists:
                 objects = bpy.data.objects

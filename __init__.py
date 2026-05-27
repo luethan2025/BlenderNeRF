@@ -35,6 +35,12 @@ PROPS = [
     # global automatic properties
     ('init_frame_step', bpy.props.IntProperty(name='Initial Frame Step') ),
     ('init_output_path', bpy.props.StringProperty(name='Initial Output Path', subtype='DIR_PATH') ),
+    ('init_use_border', bpy.props.BoolProperty(name='Init Use Border') ),
+    ('init_use_crop_to_border', bpy.props.BoolProperty(name='Init Use Crop To Border') ),
+    ('init_border_min_x', bpy.props.FloatProperty(name='Init Border Min X') ),
+    ('init_border_max_x', bpy.props.FloatProperty(name='Init Border Max X') ),
+    ('init_border_min_y', bpy.props.FloatProperty(name='Init Border Min Y') ),
+    ('init_border_max_y', bpy.props.FloatProperty(name='Init Border Max Y') ),
     ('rendering', bpy.props.BoolVectorProperty(name='Rendering', description='Whether one of the SOF, TTC or COS methods is rendering', default=(False, False, False), size=3) ),
     ('blendernerf_version', bpy.props.StringProperty(name='BlenderNeRF Version', default=VERSION) ),
 

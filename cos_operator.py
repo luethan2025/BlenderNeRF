@@ -29,7 +29,14 @@ class CameraOnSphere(blender_nerf_operator.BlenderNeRF_Operator):
            self.report({'ERROR'}, error_messages[0])
            return {'FINISHED'}
 
-        output_data = self.get_camera_intrinsics(scene, camera)
+        scale = scene.render.resolution_percentage / 100
+        width = scene.render.resolution_x * scale
+        height = scene.render.resolution_y * scale
+        if width < 800 or height < 800:
+            self.report({'ERROR'}, 'COS images must be at least 800x800 to apply center crop.')
+            return {'FINISHED'}
+
+        output_data = self.get_camera_intrinsics(scene, camera, crop_size=800)
 
         # clean directory name (unsupported characters replaced) and output path
         output_dir = bpy.path.clean_name(scene.cos_dataset_name)
@@ -58,7 +65,7 @@ class CameraOnSphere(blender_nerf_operator.BlenderNeRF_Operator):
 
             # train camera on sphere
             sphere_camera = scene.objects[CAMERA_NAME]
-            sphere_output_data = self.get_camera_intrinsics(scene, sphere_camera)
+            sphere_output_data = self.get_camera_intrinsics(scene, sphere_camera, crop_size=800)
             scene.camera = sphere_camera
 
             # training transforms
@@ -69,6 +76,9 @@ class CameraOnSphere(blender_nerf_operator.BlenderNeRF_Operator):
             if scene.render_frames:
                 output_train = os.path.join(output_path, 'train')
                 os.makedirs(output_train, exist_ok=True)
+                if not helper.set_center_crop(scene, crop_size=800):
+                    self.report({'ERROR'}, 'COS images must be rendered at least 800x800 to apply center crop.')
+                    return {'FINISHED'}
                 scene.rendering = (False, False, True)
                 scene.frame_end = scene.frame_start + scene.cos_nb_frames - 1 # update end frame
                 scene.render.filepath = os.path.join(output_train, '') # training frames path

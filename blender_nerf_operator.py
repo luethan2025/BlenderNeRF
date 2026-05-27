@@ -16,7 +16,7 @@ TMP_VERTEX_COLORS = 'blendernerf_vertex_colors_tmp'
 class BlenderNeRF_Operator(bpy.types.Operator):
 
     # camera intrinsics
-    def get_camera_intrinsics(self, scene, camera):
+    def get_camera_intrinsics(self, scene, camera, crop_size=None):
         camera_angle_x = camera.data.angle_x
         camera_angle_y = camera.data.angle_y
 
@@ -77,6 +77,24 @@ class BlenderNeRF_Operator(bpy.types.Operator):
             'h': height_res_in_px,
             'aabb_scale': scene.aabb
         }
+
+        if crop_size is not None:
+            if crop_size <= 0:
+                raise ValueError('Crop size must be positive')
+
+            if crop_size > width_res_in_px or crop_size > height_res_in_px:
+                raise ValueError('Crop size cannot be larger than render resolution')
+
+            if scene.nerf:
+                camera_angle_x = 2.0 * math.atan(math.tan(camera_angle_x / 2.0) * (crop_size / width_res_in_px))
+                camera_angle_y = 2.0 * math.atan(math.tan(camera_angle_y / 2.0) * (crop_size / height_res_in_px))
+
+            camera_intr_dict['w'] = crop_size
+            camera_intr_dict['h'] = crop_size
+            camera_intr_dict['cx'] = crop_size / 2.0
+            camera_intr_dict['cy'] = crop_size / 2.0
+            camera_intr_dict['camera_angle_x'] = camera_angle_x
+            camera_intr_dict['camera_angle_y'] = camera_angle_y
 
         return {'camera_angle_x': camera_angle_x} if scene.nerf else camera_intr_dict
 

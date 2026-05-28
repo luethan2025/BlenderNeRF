@@ -11,6 +11,7 @@ from bpy.app.handlers import persistent
 EMPTY_NAME = 'BlenderNeRF Sphere'
 CAMERA_NAME = 'BlenderNeRF Camera'
 BRIGHTNESS_MATERIAL_STATE = {}
+BRIGHTNESS_SCENE_STATE = {}
 
 ## property poll and update functions
 
@@ -242,12 +243,16 @@ def properties_desgraph(scene):
 
 
 def apply_cos_brightness(scene):
-    global BRIGHTNESS_MATERIAL_STATE
+    global BRIGHTNESS_MATERIAL_STATE, BRIGHTNESS_SCENE_STATE
     BRIGHTNESS_MATERIAL_STATE.clear()
+    BRIGHTNESS_SCENE_STATE.clear()
 
     brightness = getattr(scene, 'cos_brightness', 1.0)
-    if brightness == 1.0:
+    if brightness == 1.0 or brightness <= 0.0:
         return
+
+    BRIGHTNESS_SCENE_STATE['exposure'] = scene.view_settings.exposure
+    scene.view_settings.exposure = math.log2(brightness)
 
     for mat in bpy.data.materials:
         if not mat.use_nodes or mat.node_tree is None:
@@ -256,7 +261,7 @@ def apply_cos_brightness(scene):
         entries = []
         for node in mat.node_tree.nodes:
             if node.type == 'BSDF_PRINCIPLED':
-                if 'Base Color' in node.inputs:
+                if 'Base Color' in node.inputs and not node.inputs['Base Color'].is_linked:
                     base = node.inputs['Base Color'].default_value
                     entries.append((node.name, 'Base Color', tuple(base)))
                     node.inputs['Base Color'].default_value = (
@@ -265,12 +270,12 @@ def apply_cos_brightness(scene):
                         base[2] * brightness,
                         base[3],
                     )
-                if 'Emission Strength' in node.inputs:
+                if 'Emission Strength' in node.inputs and not node.inputs['Emission Strength'].is_linked:
                     strength = node.inputs['Emission Strength'].default_value
                     entries.append((node.name, 'Emission Strength', strength))
                     node.inputs['Emission Strength'].default_value = strength * brightness
             elif node.type == 'EMISSION':
-                if 'Strength' in node.inputs:
+                if 'Strength' in node.inputs and not node.inputs['Strength'].is_linked:
                     strength = node.inputs['Strength'].default_value
                     entries.append((node.name, 'Strength', strength))
                     node.inputs['Strength'].default_value = strength * brightness
@@ -280,7 +285,7 @@ def apply_cos_brightness(scene):
 
 
 def restore_cos_brightness():
-    global BRIGHTNESS_MATERIAL_STATE
+    global BRIGHTNESS_MATERIAL_STATE, BRIGHTNESS_SCENE_STATE
     for mat_name, entries in BRIGHTNESS_MATERIAL_STATE.items():
         mat = bpy.data.materials.get(mat_name)
         if mat is None or not mat.use_nodes or mat.node_tree is None:
@@ -293,6 +298,11 @@ def restore_cos_brightness():
             node.inputs[input_name].default_value = original_value
 
     BRIGHTNESS_MATERIAL_STATE.clear()
+
+    if 'exposure' in BRIGHTNESS_SCENE_STATE:
+        scene = bpy.context.scene
+        scene.view_settings.exposure = BRIGHTNESS_SCENE_STATE['exposure']
+        BRIGHTNESS_SCENE_STATE.clear()
 
 def empty_fn(self, context): pass
 

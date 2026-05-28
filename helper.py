@@ -10,6 +10,7 @@ from bpy.app.handlers import persistent
 # global addon script variables
 EMPTY_NAME = 'BlenderNeRF Sphere'
 CAMERA_NAME = 'BlenderNeRF Camera'
+BRIGHTNESS_MATERIAL_STATE = {}
 
 ## property poll and update functions
 
@@ -239,6 +240,60 @@ def properties_desgraph(scene):
     if CAMERA_NAME in scene.objects.keys():
         scene.objects[CAMERA_NAME].location = sample_from_sphere(scene)
 
+
+def apply_cos_brightness(scene):
+    global BRIGHTNESS_MATERIAL_STATE
+    BRIGHTNESS_MATERIAL_STATE.clear()
+
+    brightness = getattr(scene, 'cos_brightness', 1.0)
+    if brightness == 1.0:
+        return
+
+    for mat in bpy.data.materials:
+        if not mat.use_nodes or mat.node_tree is None:
+            continue
+
+        entries = []
+        for node in mat.node_tree.nodes:
+            if node.type == 'BSDF_PRINCIPLED':
+                if 'Base Color' in node.inputs:
+                    base = node.inputs['Base Color'].default_value
+                    entries.append((node.name, 'Base Color', base.copy()))
+                    node.inputs['Base Color'].default_value = (
+                        base[0] * brightness,
+                        base[1] * brightness,
+                        base[2] * brightness,
+                        base[3],
+                    )
+                if 'Emission Strength' in node.inputs:
+                    strength = node.inputs['Emission Strength'].default_value
+                    entries.append((node.name, 'Emission Strength', strength))
+                    node.inputs['Emission Strength'].default_value = strength * brightness
+            elif node.type == 'EMISSION':
+                if 'Strength' in node.inputs:
+                    strength = node.inputs['Strength'].default_value
+                    entries.append((node.name, 'Strength', strength))
+                    node.inputs['Strength'].default_value = strength * brightness
+
+        if entries:
+            BRIGHTNESS_MATERIAL_STATE[mat.name] = entries
+
+
+def restore_cos_brightness():
+    global BRIGHTNESS_MATERIAL_STATE
+    for mat_name, entries in BRIGHTNESS_MATERIAL_STATE.items():
+        mat = bpy.data.materials.get(mat_name)
+        if mat is None or not mat.use_nodes or mat.node_tree is None:
+            continue
+
+        for node_name, input_name, original_value in entries:
+            node = mat.node_tree.nodes.get(node_name)
+            if node is None or input_name not in node.inputs:
+                continue
+            node.inputs[input_name].default_value = original_value
+
+    BRIGHTNESS_MATERIAL_STATE.clear()
+
 def empty_fn(self, context): pass
 
 can_scene_upd = properties_ui
@@ -270,6 +325,7 @@ def post_render(scene):
 
         if scene.rendering[2]: # cos : reset camera settings
             restore_center_crop(scene)
+            restore_cos_brightness()
             if not scene.init_camera_exists: delete_camera(scene, CAMERA_NAME)
             if not scene.init_sphere_exists:
                 objects = bpy.data.objects

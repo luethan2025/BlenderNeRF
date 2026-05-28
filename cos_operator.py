@@ -79,6 +79,7 @@ class CameraOnSphere(blender_nerf_operator.BlenderNeRF_Operator):
                 if not helper.set_center_crop(scene, crop_size=800):
                     self.report({'ERROR'}, 'COS images must be rendered at least 800x800 to apply center crop.')
                     return {'FINISHED'}
+                helper.apply_cos_brightness(scene)
                 scene.rendering = (False, False, True)
                 scene.frame_end = scene.frame_start + scene.cos_nb_frames - 1 # update end frame
                 scene.render.filepath = os.path.join(output_train, '') # training frames path

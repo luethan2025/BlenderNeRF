@@ -40,6 +40,7 @@ class COS_UI(bpy.types.Panel):
             layout.prop(scene, 'upper_views', toggle=True)
         
         layout.prop(scene, 'outwards', toggle=True)
+        layout.prop(scene, 'cos_brightness')
 
         layout.use_property_split = False
         layout.separator()

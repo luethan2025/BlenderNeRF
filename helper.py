@@ -258,7 +258,7 @@ def apply_cos_brightness(scene):
             if node.type == 'BSDF_PRINCIPLED':
                 if 'Base Color' in node.inputs:
                     base = node.inputs['Base Color'].default_value
-                    entries.append((node.name, 'Base Color', base.copy()))
+                    entries.append((node.name, 'Base Color', tuple(base)))
                     node.inputs['Base Color'].default_value = (
                         base[0] * brightness,
                         base[1] * brightness,

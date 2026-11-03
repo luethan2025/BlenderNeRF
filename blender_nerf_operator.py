@@ -213,7 +213,7 @@ class BlenderNeRF_Operator(bpy.types.Operator):
 
         camera = scene.camera
         train_camera = scene.camera_train_target
-        val_camera = scene.camera_val_target
+        val_camera = scene.cos_camera_val_target if method == 'COS' else scene.camera_val_target
         test_camera = scene.camera_test_target
 
         sof_name = scene.sof_dataset_name

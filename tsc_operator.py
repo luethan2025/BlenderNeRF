@@ -4,11 +4,11 @@ import bpy
 from . import blender_nerf_operator
 
 
-# train, validation and test cameras operator class
+# three-split cameras operator class
 class TrainValTestCameras(blender_nerf_operator.BlenderNeRF_Operator):
-    '''Train, Val, and Test Cameras Operator'''
+    '''Three-Split Cameras Operator'''
     bl_idname = 'object.train_test_cameras'
-    bl_label = 'Train, Val, and Test Cameras TSC'
+    bl_label = 'Three-Split Cameras TSC'
 
     def execute(self, context):
         scene = context.scene

@@ -51,9 +51,9 @@ Although release versions of **BlenderNeRF** are available for download, they ar
   <img src='https://maximeraafat.github.io/assets/posts/blendernerf/SOF.gif' width='90%'/>
 </p>
 
-### Train, Val, and Test Cameras
+### Three-Split Cameras
 
-**Train, Val, and Test Cameras (TSC)** registers training, validation, and testing data from separate user-defined cameras. A NeRF model can then be fitted with the training data, tuned against validation data, and evaluated on testing data.
+**Three-Split Cameras (TSC)** registers training, validation, and testing data from separate user-defined cameras. A NeRF model can then be fitted with the training data, tuned against validation data, and evaluated on testing data.
 
 <p align='center'>
   <img src='https://maximeraafat.github.io/assets/posts/blendernerf/TTC.gif' width='90%'/>
@@ -109,7 +109,7 @@ When `Val` is enabled, SOF uses the active camera for both validation and testin
 * `Train Camera` (empty by default) : camera used for registering the training data
 * `Val Camera` (empty by default) : camera used for registering the validation data
 * `Test Camera` (empty by default) : camera used for registering the testing data
-* `PLAY TSC` : play the **Train, Val, and Test Cameras** method operator to export NeRF data
+* `PLAY TSC` : play the **Three-Split Cameras** method operator to export NeRF data
 
 `Frames` amount of training frames will be captured using the `Train Camera` object, starting from the scene start frame. The validation and testing transforms use their respective cameras over the scene frame range.
 

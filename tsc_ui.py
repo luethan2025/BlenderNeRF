@@ -1,11 +1,11 @@
 import bpy
 
 
-# train, validation and test cameras ui class
+# three-split cameras ui class
 class TSC_UI(bpy.types.Panel):
-    '''Train, Validation and Test Cameras UI'''
+    '''Three-Split Cameras UI'''
     bl_idname = 'VIEW3D_PT_tsc_ui'
-    bl_label = 'Train, Val, and Test Cameras TSC'
+    bl_label = 'Three-Split Cameras TSC'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'BlenderNeRF'

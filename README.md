@@ -73,7 +73,7 @@ Although release versions of **BlenderNeRF** are available for download, they ar
 The add-on properties panel is available under `3D View > N panel > BlenderNeRF` (the **N panel** is accessible under the 3D viewport when pressing `N`). All 3 methods (**SOF**, **TTC** and **COS**) share a common tab called `BlenderNeRF shared UI` with the below listed controllable properties.
 
 * `Train` (activated by default) : whether to register training data (renderings + camera information)
-* `Val` (deactivated by default) : whether to register validation camera information
+* `Val` (activated by default) : whether to register validation camera information
 * `Test` (activated by default) : whether to register testing data (camera information only)
 * `AABB` (by default set to **4**) : aabb scale parameter as described in Instant NGP (more details below)
 * `Render Frames` (activated by default) : whether to render the frames

@@ -24,7 +24,7 @@ VERSION = '.'.join(str(x) for x in bl_info['version'])
 PROPS = [
     # global controllable properties
     ('train_data', bpy.props.BoolProperty(name='Train', description='Construct the training data', default=True) ),
-    ('val_data', bpy.props.BoolProperty(name='Val', description='Construct the validation data', default=False) ),
+    ('val_data', bpy.props.BoolProperty(name='Val', description='Construct the validation data', default=True) ),
     ('test_data', bpy.props.BoolProperty(name='Test', description='Construct the testing data', default=True) ),
     ('aabb', bpy.props.IntProperty(name='AABB', description='AABB scale as defined in Instant NGP', default=4, soft_min=1, soft_max=128) ),
     ('render_frames', bpy.props.BoolProperty(name='Render Frames', description='Whether training frames should be rendered. If not selected, only the transforms.json files will be generated', default=True) ),

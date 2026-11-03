@@ -1,5 +1,5 @@
 import bpy
-from . import helper, blender_nerf_ui, sof_ui, ttc_ui, cos_ui, sof_operator, ttc_operator, cos_operator
+from . import helper, blender_nerf_ui, sof_ui, tsc_ui, cos_ui, sof_operator, tsc_operator, cos_operator
 
 
 # blender info
@@ -88,10 +88,10 @@ PROPS = [
 CLASSES = [
     blender_nerf_ui.BlenderNeRF_UI,
     sof_ui.SOF_UI,
-    ttc_ui.TTC_UI,
+    tsc_ui.TSC_UI,
     cos_ui.COS_UI,
     sof_operator.SubsetOfFrames,
-    ttc_operator.TrainTestCameras,
+    tsc_operator.TrainValTestCameras,
     cos_operator.CameraOnSphere
 ]
 

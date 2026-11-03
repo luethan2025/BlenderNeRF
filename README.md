@@ -53,7 +53,7 @@ Although release versions of **BlenderNeRF** are available for download, they ar
 
 ### Train, Val, and Test Cameras
 
-**Train, Val, and Test Cameras (TVTC)** registers training, validation, and testing data from separate user-defined cameras. A NeRF model can then be fitted with the training data, tuned against validation data, and evaluated on testing data.
+**Train, Val, and Test Cameras (TSC)** registers training, validation, and testing data from separate user-defined cameras. A NeRF model can then be fitted with the training data, tuned against validation data, and evaluated on testing data.
 
 <p align='center'>
   <img src='https://maximeraafat.github.io/assets/posts/blendernerf/TTC.gif' width='90%'/>
@@ -103,13 +103,13 @@ Below are described the properties specific to each method (the `Name` property 
 
 When `Val` is enabled, SOF uses the active camera for both validation and testing poses, so these splits contain the same camera views.
 
-### How to TTC
+### How to TSC
 
 * `Frames` (by default set to **100**) : number of training frames used from the training camera
 * `Train Camera` (empty by default) : camera used for registering the training data
 * `Val Camera` (empty by default) : camera used for registering the validation data
 * `Test Camera` (empty by default) : camera used for registering the testing data
-* `PLAY TVTC` : play the **Train, Val, and Test Cameras** method operator to export NeRF data
+* `PLAY TSC` : play the **Train, Val, and Test Cameras** method operator to export NeRF data
 
 `Frames` amount of training frames will be captured using the `Train Camera` object, starting from the scene start frame. The validation and testing transforms use their respective cameras over the scene frame range.
 

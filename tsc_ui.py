@@ -2,10 +2,10 @@ import bpy
 
 
 # train, validation and test cameras ui class
-class TTC_UI(bpy.types.Panel):
+class TSC_UI(bpy.types.Panel):
     '''Train, Validation and Test Cameras UI'''
-    bl_idname = 'VIEW3D_PT_ttc_ui'
-    bl_label = 'Train, Val, and Test Cameras TVTC'
+    bl_idname = 'VIEW3D_PT_tsc_ui'
+    bl_label = 'Train, Val, and Test Cameras TSC'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'BlenderNeRF'
@@ -27,4 +27,4 @@ class TTC_UI(bpy.types.Panel):
         layout.prop(scene, 'ttc_dataset_name')
 
         layout.separator()
-        layout.operator('object.train_test_cameras', text='PLAY TVTC')
+        layout.operator('object.train_test_cameras', text='PLAY TSC')

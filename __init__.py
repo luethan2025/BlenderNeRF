@@ -16,6 +16,7 @@ bl_info = {
 
 # global addon script variables
 TRAIN_CAM = 'Train Cam'
+VAL_CAM = 'Val Cam'
 TEST_CAM = 'Test Cam'
 VERSION = '.'.join(str(x) for x in bl_info['version'])
 
@@ -23,6 +24,7 @@ VERSION = '.'.join(str(x) for x in bl_info['version'])
 PROPS = [
     # global controllable properties
     ('train_data', bpy.props.BoolProperty(name='Train', description='Construct the training data', default=True) ),
+    ('val_data', bpy.props.BoolProperty(name='Val', description='Construct the validation data', default=False) ),
     ('test_data', bpy.props.BoolProperty(name='Test', description='Construct the testing data', default=True) ),
     ('aabb', bpy.props.IntProperty(name='AABB', description='AABB scale as defined in Instant NGP', default=4, soft_min=1, soft_max=128) ),
     ('render_frames', bpy.props.BoolProperty(name='Render Frames', description='Whether training frames should be rendered. If not selected, only the transforms.json files will be generated', default=True) ),
@@ -52,6 +54,7 @@ PROPS = [
     ('ttc_dataset_name', bpy.props.StringProperty(name='Name', description='Name of the TTC dataset : the data will be stored under <save path>/<name>', default='dataset') ),
     ('ttc_nb_frames', bpy.props.IntProperty(name='Frames', description='Number of training frames from the training camera', default=100, soft_min=1) ),
     ('camera_train_target', bpy.props.PointerProperty(type=bpy.types.Object, name=TRAIN_CAM, description='Pointer to the training camera', poll=helper.poll_is_camera) ),
+    ('camera_val_target', bpy.props.PointerProperty(type=bpy.types.Object, name=VAL_CAM, description='Pointer to the validation camera', poll=helper.poll_is_camera) ),
     ('camera_test_target', bpy.props.PointerProperty(type=bpy.types.Object, name=TEST_CAM, description='Pointer to the testing camera', poll=helper.poll_is_camera) ),
 
     # cos controllable properties

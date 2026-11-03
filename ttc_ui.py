@@ -1,9 +1,9 @@
 import bpy
 
 
-# train and test cameras ui class
+# train, validation and test cameras ui class
 class TTC_UI(bpy.types.Panel):
-    '''Train and Test Cameras UI'''
+    '''Train, Validation and Test Cameras UI'''
     bl_idname = 'VIEW3D_PT_ttc_ui'
     bl_label = 'Train and Test Cameras TTC'
     bl_space_type = 'VIEW_3D'
@@ -20,6 +20,7 @@ class TTC_UI(bpy.types.Panel):
         layout.use_property_split = True
         layout.prop(scene, 'ttc_nb_frames')
         layout.prop_search(scene, 'camera_train_target', scene, 'objects')
+        layout.prop_search(scene, 'camera_val_target', scene, 'objects')
         layout.prop_search(scene, 'camera_test_target', scene, 'objects')
 
         layout.separator()

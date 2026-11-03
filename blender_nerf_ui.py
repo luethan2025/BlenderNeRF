@@ -18,9 +18,10 @@ class BlenderNeRF_UI(bpy.types.Panel):
 
         row = layout.row(align=True)
         row.prop(scene, 'train_data', toggle=True)
+        row.prop(scene, 'val_data', toggle=True)
         row.prop(scene, 'test_data', toggle=True)
 
-        if not (scene.train_data or scene.test_data):
+        if not (scene.train_data or scene.val_data or scene.test_data):
             layout.label(text='Nothing will happen!')
 
         else:

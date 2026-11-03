@@ -41,7 +41,7 @@ Although release versions of **BlenderNeRF** are available for download, they ar
 
 ## Setting
 
-**BlenderNeRF** consists of 3 methods discussed in the sub-sections below. Each method is capable of creating **training** data and **testing** data for NeRF in the form of training images and a `transforms_train.json` respectively `transforms_test.json` file with the corresponding camera information. The data is archived into a single **ZIP** file containing training and testing folders. Training data can then be used by a NeRF model to learn the 3D scene representation. Once trained, the model may be evaluated (or tested) on the testing data (camera information only) to obtain novel renders.
+**BlenderNeRF** consists of 3 methods discussed in the sub-sections below. Each method can create **training**, **validation**, and **testing** data for NeRF. Training images and camera information are stored in `train/` and `transforms_train.json`; validation and testing camera information are stored in `transforms_val.json` and `transforms_test.json`. The data is archived into a single **ZIP** file. Training data can then be used by a NeRF model to learn the 3D scene representation, while validation and testing poses can be used to evaluate novel views.
 
 ### Subset of Frames
 
@@ -73,6 +73,7 @@ Although release versions of **BlenderNeRF** are available for download, they ar
 The add-on properties panel is available under `3D View > N panel > BlenderNeRF` (the **N panel** is accessible under the 3D viewport when pressing `N`). All 3 methods (**SOF**, **TTC** and **COS**) share a common tab called `BlenderNeRF shared UI` with the below listed controllable properties.
 
 * `Train` (activated by default) : whether to register training data (renderings + camera information)
+* `Val` (deactivated by default) : whether to register validation camera information
 * `Test` (activated by default) : whether to register testing data (camera information only)
 * `AABB` (by default set to **4**) : aabb scale parameter as described in Instant NGP (more details below)
 * `Render Frames` (activated by default) : whether to render the frames
@@ -100,14 +101,17 @@ Below are described the properties specific to each method (the `Name` property 
 * `Camera` (always set to the active camera) : camera used for registering training and testing data
 * `PLAY SOF` : play the **Subset of Frames** method operator to export NeRF data
 
+When `Val` is enabled, SOF uses the active camera and scene frame range to export validation poses.
+
 ### How to TTC
 
 * `Frames` (by default set to **100**) : number of training frames used from the training camera
 * `Train Cam` (empty by default) : camera used for registering the training data
+* `Val Cam` (empty by default) : camera used for registering the validation data
 * `Test Cam` (empty by default) : camera used for registering the testing data
 * `PLAY TTC` : play the **Train and Test Cameras** method operator to export NeRF data
 
-`Frames` amount of training frames will be captured using the `Train Cam` object, starting from the scene start frame.
+`Frames` amount of training frames will be captured using the `Train Cam` object, starting from the scene start frame. The validation and testing transforms use their respective cameras over the scene frame range.
 
 ### How to COS
 
@@ -124,6 +128,8 @@ Below are described the properties specific to each method (the `Name` property 
 * `Upper Views` (deactivated by default) : whether to sample views from the upper training hemisphere only (rotation variant)
 * `Outwards` (deactivated by default) : whether to point the camera outwards of the training sphere
 * `PLAY COS` : play the **Camera on Sphere** method operator to export NeRF data
+
+When `Val` is enabled, COS uses the active camera and scene frame range to export validation poses.
 
 Note that activating the `Sphere` and `Camera` properties creates a `BlenderNeRF Sphere` empty object and a `BlenderNeRF Camera` camera object respectively. Please do not create any objects with these names manually, since this might break the add-on functionalities.
 

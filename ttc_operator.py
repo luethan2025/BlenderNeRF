@@ -13,12 +13,8 @@ class TrainTestCameras(blender_nerf_operator.BlenderNeRF_Operator):
     def execute(self, context):
         scene = context.scene
         train_camera = scene.camera_train_target
+        val_camera = scene.camera_val_target
         test_camera = scene.camera_test_target
-
-        # check if cameras are selected : next errors depend on existing cameras
-        if train_camera == None or test_camera == None:
-            self.report({'ERROR'}, 'Be sure to have selected a train and test camera!')
-            return {'FINISHED'}
 
         # if there is an error, print first error message
         error_messages = self.asserts(scene, method='TTC')
@@ -26,13 +22,14 @@ class TrainTestCameras(blender_nerf_operator.BlenderNeRF_Operator):
            self.report({'ERROR'}, error_messages[0])
            return {'FINISHED'}
 
-        output_train_data = self.get_camera_intrinsics(scene, train_camera)
-        output_test_data = self.get_camera_intrinsics(scene, test_camera)
-
         # clean directory name (unsupported characters replaced) and output path
         output_dir = bpy.path.clean_name(scene.ttc_dataset_name)
         output_path = os.path.join(scene.save_path, output_dir)
         os.makedirs(output_path, exist_ok=True)
+
+        output_train_data = self.get_camera_intrinsics(scene, train_camera) if scene.train_data else None
+        output_val_data = self.get_camera_intrinsics(scene, val_camera) if scene.val_data else None
+        output_test_data = self.get_camera_intrinsics(scene, test_camera) if scene.test_data else None
 
         if scene.logs: self.save_log_file(scene, output_path, method='TTC')
         if scene.splats: self.save_splats_ply(scene, output_path)
@@ -45,6 +42,11 @@ class TrainTestCameras(blender_nerf_operator.BlenderNeRF_Operator):
             # testing transforms
             output_test_data['frames'] = self.get_camera_extrinsics(scene, test_camera, mode='TEST', method='TTC')
             self.save_json(output_path, 'transforms_test.json', output_test_data)
+
+        if scene.val_data:
+            # validation transforms
+            output_val_data['frames'] = self.get_camera_extrinsics(scene, val_camera, mode='VAL', method='TTC')
+            self.save_json(output_path, 'transforms_val.json', output_val_data)
 
         if scene.train_data:
             # training transforms

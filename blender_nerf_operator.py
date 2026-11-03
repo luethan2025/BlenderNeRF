@@ -7,6 +7,7 @@ import bpy
 
 # global addon script variables
 OUTPUT_TRAIN = 'train'
+OUTPUT_VAL = 'val'
 OUTPUT_TEST = 'test'
 CAMERA_NAME = 'BlenderNeRF Camera'
 TMP_VERTEX_COLORS = 'blendernerf_vertex_colors_tmp'
@@ -100,7 +101,7 @@ class BlenderNeRF_Operator(bpy.types.Operator):
 
     # camera extrinsics (transform matrices)
     def get_camera_extrinsics(self, scene, camera, mode='TRAIN', method='SOF'):
-        assert mode == 'TRAIN' or mode == 'TEST'
+        assert mode == 'TRAIN' or mode == 'VAL' or mode == 'TEST'
         assert method == 'SOF' or method == 'TTC' or method == 'COS'
 
         if scene.splats and scene.splats_test_dummy and mode == 'TEST':
@@ -119,7 +120,11 @@ class BlenderNeRF_Operator(bpy.types.Operator):
         frame_index = 0
         for frame in range(scene.frame_start, end + 1, step):
             scene.frame_set(frame)
-            filedir = OUTPUT_TRAIN * (mode == 'TRAIN') + OUTPUT_TEST * (mode == 'TEST')
+            filedir = {
+                'TRAIN': OUTPUT_TRAIN,
+                'VAL': OUTPUT_VAL,
+                'TEST': OUTPUT_TEST
+            }[mode]
 
             frame_filename = f'r_{frame_index}'
             frame_data = {
@@ -208,6 +213,7 @@ class BlenderNeRF_Operator(bpy.types.Operator):
 
         camera = scene.camera
         train_camera = scene.camera_train_target
+        val_camera = scene.camera_val_target
         test_camera = scene.camera_test_target
 
         sof_name = scene.sof_dataset_name
@@ -219,8 +225,17 @@ class BlenderNeRF_Operator(bpy.types.Operator):
         if (method == 'SOF' or method == 'COS') and not camera.data.type == 'PERSP':
             error_messages.append('Only perspective cameras are supported!')
 
-        if method == 'TTC' and not (train_camera.data.type == 'PERSP' and test_camera.data.type == 'PERSP'):
-           error_messages.append('Only perspective cameras are supported!')
+        if method == 'TTC':
+            selected_cameras = (
+                (scene.train_data, train_camera, 'training'),
+                (scene.val_data, val_camera, 'validation'),
+                (scene.test_data, test_camera, 'testing')
+            )
+            for enabled, selected_camera, split_name in selected_cameras:
+                if enabled and selected_camera is None:
+                    error_messages.append(f'Be sure to select a {split_name} camera!')
+                elif enabled and selected_camera.data.type != 'PERSP':
+                    error_messages.append('Only perspective cameras are supported!')
 
         if method == 'COS' and CAMERA_NAME in scene.objects.keys():
             sphere_camera = scene.objects[CAMERA_NAME]
@@ -254,6 +269,7 @@ class BlenderNeRF_Operator(bpy.types.Operator):
         logdata = {
             'BlenderNeRF Version': scene.blendernerf_version,
             'Train': scene.train_data,
+            'Val': scene.val_data,
             'Test': scene.test_data,
             'AABB': scene.aabb,
             'Render Frames': scene.render_frames,
@@ -267,8 +283,12 @@ class BlenderNeRF_Operator(bpy.types.Operator):
             logdata['Dataset Name'] = scene.sof_dataset_name
 
         elif method == 'TTC':
-            logdata['Train Camera Name'] = scene.camera_train_target.name
-            logdata['Test Camera Name'] = scene.camera_test_target.name
+            if scene.camera_train_target is not None:
+                logdata['Train Camera Name'] = scene.camera_train_target.name
+            if scene.camera_val_target is not None:
+                logdata['Val Camera Name'] = scene.camera_val_target.name
+            if scene.camera_test_target is not None:
+                logdata['Test Camera Name'] = scene.camera_test_target.name
             logdata['Frames'] = scene.ttc_nb_frames
             logdata['Dataset Name'] = scene.ttc_dataset_name
 

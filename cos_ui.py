@@ -18,7 +18,7 @@ class COS_UI(bpy.types.Panel):
         layout.alignment = 'CENTER'
 
         layout.use_property_split = True
-        layout.prop(scene, 'camera', text='Val/Test Camera')
+        layout.prop(scene, 'camera', text='Camera')
         layout.prop(scene, 'sphere_location')
         layout.prop(scene, 'sphere_rotation')
         layout.prop(scene, 'sphere_scale')

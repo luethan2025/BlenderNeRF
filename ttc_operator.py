@@ -6,9 +6,9 @@ from . import blender_nerf_operator
 
 # train and test cameras operator class
 class TrainTestCameras(blender_nerf_operator.BlenderNeRF_Operator):
-    '''Train and Test Cameras Operator'''
+    '''Train, Val, and Test Cameras Operator'''
     bl_idname = 'object.train_test_cameras'
-    bl_label = 'Train and Test Cameras TTC'
+    bl_label = 'Train, Val, and Test Cameras TVTC'
 
     def execute(self, context):
         scene = context.scene

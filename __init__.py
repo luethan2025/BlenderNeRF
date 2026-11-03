@@ -16,7 +16,7 @@ bl_info = {
 
 # global addon script variables
 TRAIN_CAM = 'Train Cam'
-VAL_CAM = 'Val Cam'
+VAL_CAM = 'Val Camera'
 TEST_CAM = 'Test Cam'
 VERSION = '.'.join(str(x) for x in bl_info['version'])
 

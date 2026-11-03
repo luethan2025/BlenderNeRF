@@ -101,13 +101,13 @@ Below are described the properties specific to each method (the `Name` property 
 * `Camera` (always set to the active camera) : camera used for registering training and testing data
 * `PLAY SOF` : play the **Subset of Frames** method operator to export NeRF data
 
-When `Val` is enabled, SOF uses `Val Cam` and the active camera over the scene frame range for validation and testing poses respectively.
+When `Val` is enabled, SOF uses `Val Camera` and the active camera over the scene frame range for validation and testing poses respectively.
 
 ### How to TTC
 
 * `Frames` (by default set to **100**) : number of training frames used from the training camera
 * `Train Cam` (empty by default) : camera used for registering the training data
-* `Val Cam` (empty by default) : camera used for registering the validation data
+* `Val Camera` (empty by default) : camera used for registering the validation data
 * `Test Cam` (empty by default) : camera used for registering the testing data
 * `PLAY TVTC` : play the **Train, Val, and Test Cameras** method operator to export NeRF data
 
@@ -116,7 +116,7 @@ When `Val` is enabled, SOF uses `Val Cam` and the active camera over the scene f
 ### How to COS
 
 * `Camera` (always set to the active camera) : camera used for registering the testing data
-* `Val Cam` : TTC validation camera, independent of the COS validation camera
+* `Val Camera` : TTC validation camera, independent of the COS validation camera
 * `Location` (by default set to **0 m** vector) : center position of the training sphere from which camera views are sampled
 * `Rotation` (by default set to **0°** vector) : rotation of the training sphere from which camera views are sampled
 * `Scale` (by default set to **1** vector) : scale vector of the training sphere in xyz axes
@@ -130,7 +130,7 @@ When `Val` is enabled, SOF uses `Val Cam` and the active camera over the scene f
 * `Outwards` (deactivated by default) : whether to point the camera outwards of the training sphere
 * `PLAY COS` : play the **Camera on Sphere** method operator to export NeRF data
 
-When `Val` is enabled, COS uses its own `Val Cam` selector, independent of the TTC selector. The active camera supplies testing poses.
+When `Val` is enabled, COS uses its own `Val Camera` selector, independent of the TTC selector. The active camera supplies testing poses.
 
 Note that activating the `Sphere` and `Camera` properties creates a `BlenderNeRF Sphere` empty object and a `BlenderNeRF Camera` camera object respectively. Please do not create any objects with these names manually, since this might break the add-on functionalities.
 

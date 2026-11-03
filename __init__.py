@@ -15,9 +15,9 @@ bl_info = {
 }
 
 # global addon script variables
-TRAIN_CAM = 'Train Cam'
+TRAIN_CAM = 'Train Camera'
 VAL_CAM = 'Val Camera'
-TEST_CAM = 'Test Cam'
+TEST_CAM = 'Test Camera'
 VERSION = '.'.join(str(x) for x in bl_info['version'])
 
 # addon blender properties

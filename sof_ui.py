@@ -20,9 +20,7 @@ class SOF_UI(bpy.types.Panel):
         layout.prop(scene, 'train_frame_steps')
 
         layout.use_property_split = True
-        layout.prop(scene, 'camera', text='Train/Test Camera')
-        if scene.val_data:
-            layout.prop_search(scene, 'camera_val_target', scene, 'objects')
+        layout.prop(scene, 'camera', text='Train/Val/Test Camera')
 
         layout.separator()
         layout.prop(scene, 'sof_dataset_name')

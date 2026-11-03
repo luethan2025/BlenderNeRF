@@ -237,6 +237,17 @@ class BlenderNeRF_Operator(bpy.types.Operator):
                 elif enabled and selected_camera.data.type != 'PERSP':
                     error_messages.append('Only perspective cameras are supported!')
 
+        elif scene.val_data:
+            if val_camera is None:
+                error_messages.append('Be sure to select a validation camera!')
+            elif val_camera.data.type != 'PERSP':
+                error_messages.append('Only perspective cameras are supported!')
+
+        if scene.val_data and scene.test_data:
+            testing_camera = test_camera if method == 'TTC' else camera
+            if val_camera is not None and val_camera == testing_camera:
+                error_messages.append('Validation and testing must use different cameras!')
+
         if method == 'COS' and CAMERA_NAME in scene.objects.keys():
             sphere_camera = scene.objects[CAMERA_NAME]
             if not sphere_camera.data.type == 'PERSP':

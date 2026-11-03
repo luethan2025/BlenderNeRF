@@ -46,8 +46,9 @@ class SubsetOfFrames(blender_nerf_operator.BlenderNeRF_Operator):
 
         if scene.val_data:
             # validation transforms
-            output_data['frames'] = self.get_camera_extrinsics(scene, camera, mode='VAL', method='SOF')
-            self.save_json(output_path, 'transforms_val.json', output_data)
+            output_val_data = self.get_camera_intrinsics(scene, scene.camera_val_target)
+            output_val_data['frames'] = self.get_camera_extrinsics(scene, scene.camera_val_target, mode='VAL', method='SOF')
+            self.save_json(output_path, 'transforms_val.json', output_val_data)
 
         if scene.train_data:
             # training transforms

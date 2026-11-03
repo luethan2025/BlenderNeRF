@@ -62,8 +62,9 @@ class CameraOnSphere(blender_nerf_operator.BlenderNeRF_Operator):
 
         if scene.val_data:
             # validation transforms
-            output_data['frames'] = self.get_camera_extrinsics(scene, camera, mode='VAL', method='COS')
-            self.save_json(output_path, 'transforms_val.json', output_data)
+            output_val_data = self.get_camera_intrinsics(scene, scene.camera_val_target, crop_size=800)
+            output_val_data['frames'] = self.get_camera_extrinsics(scene, scene.camera_val_target, mode='VAL', method='COS')
+            self.save_json(output_path, 'transforms_val.json', output_val_data)
 
         if scene.train_data:
             if not scene.show_camera: scene.show_camera = True

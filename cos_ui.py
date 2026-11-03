@@ -19,6 +19,8 @@ class COS_UI(bpy.types.Panel):
 
         layout.use_property_split = True
         layout.prop(scene, 'camera')
+        if scene.val_data:
+            layout.prop_search(scene, 'camera_val_target', scene, 'objects')
         layout.prop(scene, 'sphere_location')
         layout.prop(scene, 'sphere_rotation')
         layout.prop(scene, 'sphere_scale')

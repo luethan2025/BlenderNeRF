@@ -41,7 +41,7 @@ Although release versions of **BlenderNeRF** are available for download, they ar
 
 ## Setting
 
-**BlenderNeRF** consists of 3 methods discussed in the sub-sections below. Each method can create **training**, **validation**, and **testing** data for NeRF. Training images and camera information are stored in `train/` and `transforms_train.json`; validation and testing camera information are stored in `transforms_val.json` and `transforms_test.json`. The data is archived into a single **ZIP** file. Training data can then be used by a NeRF model to learn the 3D scene representation, while validation and testing poses can be used to evaluate novel views.
+**BlenderNeRF** consists of 3 methods discussed in the sub-sections below. Each method can create **training**, **validation**, and **testing** data for NeRF. Training images and camera information are stored in `train/` and `transforms_train.json`; validation and testing camera information are stored in `transforms_val.json` and `transforms_test.json`. Val and Test use separate cameras, so they export different camera poses. The data is archived into a single **ZIP** file. Training data can then be used by a NeRF model to learn the 3D scene representation, while validation and testing poses can be used to evaluate novel views.
 
 ### Subset of Frames
 
@@ -101,7 +101,7 @@ Below are described the properties specific to each method (the `Name` property 
 * `Camera` (always set to the active camera) : camera used for registering training and testing data
 * `PLAY SOF` : play the **Subset of Frames** method operator to export NeRF data
 
-When `Val` is enabled, SOF uses the active camera and scene frame range to export validation poses.
+When `Val` is enabled, SOF uses `Val Cam` and the active camera over the scene frame range for validation and testing poses respectively.
 
 ### How to TTC
 
@@ -116,6 +116,7 @@ When `Val` is enabled, SOF uses the active camera and scene frame range to expor
 ### How to COS
 
 * `Camera` (always set to the active camera) : camera used for registering the testing data
+* `Val Cam` : camera used for registering validation data when `Val` is enabled
 * `Location` (by default set to **0 m** vector) : center position of the training sphere from which camera views are sampled
 * `Rotation` (by default set to **0°** vector) : rotation of the training sphere from which camera views are sampled
 * `Scale` (by default set to **1** vector) : scale vector of the training sphere in xyz axes
@@ -129,7 +130,7 @@ When `Val` is enabled, SOF uses the active camera and scene frame range to expor
 * `Outwards` (deactivated by default) : whether to point the camera outwards of the training sphere
 * `PLAY COS` : play the **Camera on Sphere** method operator to export NeRF data
 
-When `Val` is enabled, COS uses the active camera and scene frame range to export validation poses.
+When `Val` is enabled, COS uses `Val Cam` and the active camera over the scene frame range for validation and testing poses respectively.
 
 Note that activating the `Sphere` and `Camera` properties creates a `BlenderNeRF Sphere` empty object and a `BlenderNeRF Camera` camera object respectively. Please do not create any objects with these names manually, since this might break the add-on functionalities.
 

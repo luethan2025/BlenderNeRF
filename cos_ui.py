@@ -18,7 +18,7 @@ class COS_UI(bpy.types.Panel):
         layout.alignment = 'CENTER'
 
         layout.use_property_split = True
-        layout.prop(scene, 'camera')
+        layout.prop(scene, 'camera', text='Train Camera')
         if scene.val_data:
             layout.prop_search(scene, 'cos_camera_val_target', scene, 'objects')
         layout.prop(scene, 'sphere_location')

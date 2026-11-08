@@ -117,7 +117,6 @@ class BlenderNeRF_Operator(bpy.types.Operator):
             end = scene.frame_end
 
         camera_extr_dict = []
-        frame_index = 0
         for frame in range(scene.frame_start, end + 1, step):
             scene.frame_set(frame)
             filedir = {
@@ -126,14 +125,13 @@ class BlenderNeRF_Operator(bpy.types.Operator):
                 'TEST': OUTPUT_TEST
             }[mode]
 
-            frame_filename = f'r_{frame_index}'
+            frame_filename = f'{frame:04d}'
             frame_data = {
                 'file_path': os.path.join(filedir, frame_filename).replace('\\', '/'),
                 'transform_matrix': self.listify_matrix(camera.matrix_world)
             }
 
             camera_extr_dict.append(frame_data)
-            frame_index += 1
 
         scene.frame_set(initFrame) # set back to initial frame
 

@@ -1,7 +1,7 @@
 import os
 import shutil
 import bpy
-from . import blender_nerf_operator
+from . import helper, blender_nerf_operator
 
 
 # three-split cameras operator class
@@ -60,7 +60,7 @@ class TrainValTestCameras(blender_nerf_operator.BlenderNeRF_Operator):
                 scene.rendering = (False, True, False)
                 scene.frame_end = scene.frame_start + scene.ttc_nb_frames - 1 # update end frame
                 scene.render.filepath = os.path.join(output_train, '') # training frames path
-                scene.render.film_transparent = True # enable transparent background
+                helper.set_render_background(scene)
                 bpy.ops.render.render('INVOKE_DEFAULT', animation=True, write_still=True) # render scene
 
         # if frames are rendered, the below code is executed by the handler function

@@ -304,6 +304,34 @@ def restore_cos_brightness():
         scene.view_settings.exposure = BRIGHTNESS_SCENE_STATE['exposure']
         BRIGHTNESS_SCENE_STATE.clear()
 
+def set_render_background(scene):
+    scene.init_render_film_transparent = scene.render.film_transparent
+    scene.init_render_file_format = scene.render.image_settings.file_format
+    scene.init_render_color_mode = scene.render.image_settings.color_mode
+    scene.init_world = scene.world
+    scene.init_render_world_temp = None
+
+    if scene.use_transparent_background:
+        scene.render.film_transparent = True
+        scene.render.image_settings.file_format = 'PNG'
+        scene.render.image_settings.color_mode = 'RGBA'
+    else:
+        scene.render.film_transparent = False
+        white_world = bpy.data.worlds.new('BlenderNeRF White Render World')
+        white_world.use_nodes = False
+        white_world.color = (1.0, 1.0, 1.0)
+        scene.world = white_world
+        scene.init_render_world_temp = white_world
+
+def restore_render_background(scene):
+    scene.render.film_transparent = scene.init_render_film_transparent
+    scene.render.image_settings.file_format = scene.init_render_file_format
+    scene.render.image_settings.color_mode = scene.init_render_color_mode
+    scene.world = scene.init_world
+    if scene.init_render_world_temp is not None and scene.init_render_world_temp.users == 0:
+        bpy.data.worlds.remove(scene.init_render_world_temp)
+    scene.init_render_world_temp = None
+
 def empty_fn(self, context): pass
 
 can_scene_upd = properties_ui
@@ -348,6 +376,7 @@ def post_render(scene):
 
         scene.rendering = (False, False, False)
         scene.render.filepath = scene.init_output_path # reset filepath
+        restore_render_background(scene)
 
         # clean directory name (unsupported characters replaced) and output path
         output_dir = bpy.path.clean_name(method_dataset_name)

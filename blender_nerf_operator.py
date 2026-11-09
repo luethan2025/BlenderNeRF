@@ -276,6 +276,7 @@ class BlenderNeRF_Operator(bpy.types.Operator):
             'Test': scene.test_data,
             'AABB': scene.aabb,
             'Render Frames': scene.render_frames,
+            'Transparent Background': scene.use_transparent_background,
             'File Format': 'NeRF' if scene.nerf else 'NGP',
             'Method': method
         }

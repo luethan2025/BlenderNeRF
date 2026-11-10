@@ -27,7 +27,6 @@ PROPS = [
     ('val_data', bpy.props.BoolProperty(name='Val', description='Construct the validation data', default=True) ),
     ('test_data', bpy.props.BoolProperty(name='Test', description='Construct the testing data', default=True) ),
     ('aabb', bpy.props.IntProperty(name='AABB', description='AABB scale as defined in Instant NGP', default=4, soft_min=1, soft_max=128) ),
-    ('render_frames', bpy.props.BoolProperty(name='Render Frames', description='Whether training frames should be rendered. If not selected, only the transforms.json files will be generated', default=True) ),
     ('use_transparent_background', bpy.props.BoolProperty(name='Use Transparent Background', description='Save rendered training images with a transparent background instead of white', default=False) ),
     ('logs', bpy.props.BoolProperty(name='Save Log File', description='Whether to create a log file containing information on the BlenderNeRF run', default=False) ),
     ('splats', bpy.props.BoolProperty(name='Gaussian Points', description='Whether to export a points3d.ply file for Gaussian Splatting', default=False) ),

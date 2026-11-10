@@ -79,18 +79,17 @@ class CameraOnSphere(blender_nerf_operator.BlenderNeRF_Operator):
             self.save_json(output_path, 'transforms_train.json', sphere_output_data)
 
             # rendering
-            if scene.render_frames:
-                output_train = os.path.join(output_path, 'train')
-                os.makedirs(output_train, exist_ok=True)
-                if not helper.set_center_crop(scene, crop_size=800):
-                    self.report({'ERROR'}, 'COS images must be rendered at least 800x800 to apply center crop.')
-                    return {'FINISHED'}
-                helper.apply_cos_brightness(scene)
-                scene.rendering = (False, False, True)
-                scene.frame_end = scene.frame_start + scene.cos_nb_frames - 1 # update end frame
-                scene.render.filepath = os.path.join(output_train, '') # training frames path
-                helper.set_render_background(scene)
-                bpy.ops.render.render('INVOKE_DEFAULT', animation=True, write_still=True) # render scene
+            output_train = os.path.join(output_path, 'train')
+            os.makedirs(output_train, exist_ok=True)
+            if not helper.set_center_crop(scene, crop_size=800):
+                self.report({'ERROR'}, 'COS images must be rendered at least 800x800 to apply center crop.')
+                return {'FINISHED'}
+            helper.apply_cos_brightness(scene)
+            scene.rendering = (False, False, True)
+            scene.frame_end = scene.frame_start + scene.cos_nb_frames - 1 # update end frame
+            scene.render.filepath = os.path.join(output_train, '') # training frames path
+            helper.set_render_background(scene)
+            bpy.ops.render.render('INVOKE_DEFAULT', animation=True, write_still=True) # render scene
 
         # if frames are rendered, the below code is executed by the handler function
         if not any(scene.rendering):

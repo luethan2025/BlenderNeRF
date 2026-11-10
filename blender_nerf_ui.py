@@ -27,10 +27,6 @@ class BlenderNeRF_UI(bpy.types.Panel):
         else:
             layout.prop(scene, 'aabb')
 
-            if scene.train_data:
-                layout.separator()
-                layout.prop(scene, 'render_frames')
-
             layout.prop(scene, 'use_transparent_background', text='Use Transparent Background')
             layout.prop(scene, 'logs')
             layout.prop(scene, 'splats', text='Gaussian Points (PLY file)')

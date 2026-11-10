@@ -56,14 +56,13 @@ class SubsetOfFrames(blender_nerf_operator.BlenderNeRF_Operator):
             self.save_json(output_path, 'transforms_train.json', output_data)
 
             # rendering
-            if scene.render_frames:
-                output_train = os.path.join(output_path, 'train')
-                os.makedirs(output_train, exist_ok=True)
-                scene.rendering = (True, False, False)
-                scene.frame_step = scene.train_frame_steps # update frame step
-                scene.render.filepath = os.path.join(output_train, '') # training frames path
-                helper.set_render_background(scene)
-                bpy.ops.render.render('INVOKE_DEFAULT', animation=True, write_still=True) # render scene
+            output_train = os.path.join(output_path, 'train')
+            os.makedirs(output_train, exist_ok=True)
+            scene.rendering = (True, False, False)
+            scene.frame_step = scene.train_frame_steps # update frame step
+            scene.render.filepath = os.path.join(output_train, '') # training frames path
+            helper.set_render_background(scene)
+            bpy.ops.render.render('INVOKE_DEFAULT', animation=True, write_still=True) # render scene
 
         # if frames are rendered, the below code is executed by the handler function
         if not any(scene.rendering):

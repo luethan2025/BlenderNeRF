@@ -76,7 +76,6 @@ The add-on properties panel is available under `3D View > N panel > BlenderNeRF`
 * `Val` (activated by default) : whether to register validation camera information
 * `Test` (activated by default) : whether to register testing data (camera information only)
 * `AABB` (by default set to **4**) : aabb scale parameter as described in Instant NGP (more details below)
-* `Render Frames` (activated by default) : whether to render the frames
 * `Use Transparent Background` (deactivated by default) : whether rendered training images should have a transparent background; otherwise, the background is white. Transparent renders are saved as RGBA PNGs.
 * `Save Log File` (deactivated by default) : whether to save a log file containing reproducibility information on the **BlenderNeRF** run
 * `File Format` (**NGP** by default) : whether to export the camera files in the Instant NGP or defaut NeRF file format convention

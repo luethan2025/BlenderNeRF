@@ -23,11 +23,11 @@ VERSION = '.'.join(str(x) for x in bl_info['version'])
 # addon blender properties
 PROPS = [
     # global controllable properties
-    ('train_data', bpy.props.BoolProperty(name='Train', description='Construct the training data', default=True) ),
-    ('val_data', bpy.props.BoolProperty(name='Val', description='Construct the validation data', default=True) ),
-    ('test_data', bpy.props.BoolProperty(name='Test', description='Construct the testing data', default=True) ),
+    ('train_data', bpy.props.BoolProperty(name='Train', description='Render training images and save camera information', default=True) ),
+    ('val_data', bpy.props.BoolProperty(name='Val', description='Render validation images and save camera information', default=True) ),
+    ('test_data', bpy.props.BoolProperty(name='Test', description='Render test images and save camera information', default=True) ),
     ('aabb', bpy.props.IntProperty(name='AABB', description='AABB scale as defined in Instant NGP', default=4, soft_min=1, soft_max=128) ),
-    ('use_transparent_background', bpy.props.BoolProperty(name='Use Transparent Background', description='Save rendered training images with a transparent background instead of white', default=False) ),
+    ('use_transparent_background', bpy.props.BoolProperty(name='Use Transparent Background', description='Save rendered dataset images with a transparent background instead of white', default=False) ),
     ('logs', bpy.props.BoolProperty(name='Save Log File', description='Whether to create a log file containing information on the BlenderNeRF run', default=False) ),
     ('splats', bpy.props.BoolProperty(name='Gaussian Points', description='Whether to export a points3d.ply file for Gaussian Splatting', default=False) ),
     ('splats_test_dummy', bpy.props.BoolProperty(name='Dummy Test Camera', description='Whether to export a dummy test transforms.json file or the full set of test camera poses', default=True) ),
@@ -87,6 +87,7 @@ PROPS = [
     ('init_camera_exists', bpy.props.BoolProperty(name='Init camera exists', description='Whether the camera initially exists', default=False) ),
     ('init_active_camera', bpy.props.PointerProperty(type=bpy.types.Object, name='Init active camera', description='Pointer to initial active camera', poll=helper.poll_is_camera) ),
     ('init_frame_end', bpy.props.IntProperty(name='Initial Frame End') ),
+    ('render_queue', bpy.props.StringProperty(name='Render Queue') ),
 ]
 
 # classes to register / unregister
@@ -109,7 +110,7 @@ def register():
         bpy.utils.register_class(cls)
 
     bpy.app.handlers.render_complete.append(helper.post_render)
-    bpy.app.handlers.render_cancel.append(helper.post_render)
+    bpy.app.handlers.render_cancel.append(helper.cancel_render)
     bpy.app.handlers.frame_change_post.append(helper.cos_camera_update)
     bpy.app.handlers.depsgraph_update_post.append(helper.properties_desgraph_upd)
     bpy.app.handlers.depsgraph_update_post.append(helper.set_init_props)
@@ -120,7 +121,7 @@ def unregister():
         delattr(bpy.types.Scene, prop_name)
 
     bpy.app.handlers.render_complete.remove(helper.post_render)
-    bpy.app.handlers.render_cancel.remove(helper.post_render)
+    bpy.app.handlers.render_cancel.remove(helper.cancel_render)
     bpy.app.handlers.frame_change_post.remove(helper.cos_camera_update)
     bpy.app.handlers.depsgraph_update_post.remove(helper.properties_desgraph_upd)
     # bpy.app.handlers.depsgraph_update_post.remove(helper.set_init_props)

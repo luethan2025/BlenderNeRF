@@ -37,35 +37,52 @@ class SubsetOfFrames(blender_nerf_operator.BlenderNeRF_Operator):
 
         # initial properties might have changed since set_init_props update
         scene.init_frame_step = scene.frame_step
+        scene.init_frame_end = scene.frame_end
         scene.init_output_path = scene.render.filepath
+        scene.init_active_camera = camera
+        render_queue = []
 
         if scene.test_data:
             # testing transforms
             output_data['frames'] = self.get_camera_extrinsics(scene, camera, mode='TEST', method='SOF')
             self.save_json(output_path, 'transforms_test.json', output_data)
+            if not (scene.splats and scene.splats_test_dummy):
+                render_queue.append({
+                    'camera': camera.name,
+                    'directory': os.path.join(output_path, 'test'),
+                    'frame_end': scene.frame_end,
+                    'frame_step': scene.frame_step
+                })
 
         if scene.val_data:
             # validation transforms
             output_val_data = self.get_camera_intrinsics(scene, camera)
             output_val_data['frames'] = self.get_camera_extrinsics(scene, camera, mode='VAL', method='SOF')
             self.save_json(output_path, 'transforms_val.json', output_val_data)
+            render_queue.append({
+                'camera': camera.name,
+                'directory': os.path.join(output_path, 'val'),
+                'frame_end': scene.frame_end,
+                'frame_step': scene.frame_step
+            })
 
         if scene.train_data:
             # training transforms
             output_data['frames'] = self.get_camera_extrinsics(scene, camera, mode='TRAIN', method='SOF')
             self.save_json(output_path, 'transforms_train.json', output_data)
 
-            # rendering
-            output_train = os.path.join(output_path, 'train')
-            os.makedirs(output_train, exist_ok=True)
-            scene.rendering = (True, False, False)
-            scene.frame_step = scene.train_frame_steps # update frame step
-            scene.render.filepath = os.path.join(output_train, '') # training frames path
-            helper.set_render_background(scene)
-            bpy.ops.render.render('INVOKE_DEFAULT', animation=True, write_still=True) # render scene
+            render_queue.append({
+                'camera': camera.name,
+                'directory': os.path.join(output_path, 'train'),
+                'frame_end': scene.frame_end,
+                'frame_step': scene.train_frame_steps
+            })
 
-        # if frames are rendered, the below code is executed by the handler function
-        if not any(scene.rendering):
+        if render_queue:
+            scene.rendering = (True, False, False)
+            helper.set_render_background(scene)
+            helper.start_render_queue(scene, render_queue)
+        else:
             # compress dataset and remove folder (only keep zip)
             shutil.make_archive(output_path, 'zip', output_path) # output filename = output_path
             shutil.rmtree(output_path)

@@ -41,7 +41,7 @@ Although release versions of **BlenderNeRF** are available for download, they ar
 
 ## Setting
 
-**BlenderNeRF** consists of 3 methods discussed in the sub-sections below. Each method can create **training**, **validation**, and **testing** data for NeRF. Training images and camera information are stored in `train/` and `transforms_train.json`; validation and testing camera information are stored in `transforms_val.json` and `transforms_test.json`. Val and Test use separate cameras, so they export different camera poses. The data is archived into a single **ZIP** file. Training data can then be used by a NeRF model to learn the 3D scene representation, while validation and testing poses can be used to evaluate novel views.
+**BlenderNeRF** consists of 3 methods discussed in the sub-sections below. Each method can create **training**, **validation**, and **testing** data for NeRF. Images and camera information for each enabled split are stored in `train/`, `val/`, and `test/` alongside `transforms_train.json`, `transforms_val.json`, and `transforms_test.json`. Val and Test use separate cameras where the method supports them, so they export different camera poses. The data is archived into a single **ZIP** file. Training data can then be used by a NeRF model to learn the 3D scene representation, while validation and testing data can be used to evaluate novel views.
 
 ### Subset of Frames
 
@@ -61,7 +61,7 @@ Although release versions of **BlenderNeRF** are available for download, they ar
 
 ### Camera on Sphere
 
-**Camera on Sphere (COS)** renders training frames by uniformly sampling random camera views directed at the center from a user controlled sphere. Testing data is extracted from a selected camera.
+**Camera on Sphere (COS)** renders training frames by uniformly sampling random camera views directed at the center from a user controlled sphere. Validation and testing images are rendered from the selected camera.
 
 <p align='center'>
   <img src='https://maximeraafat.github.io/assets/posts/blendernerf/COS.gif' width='90%'/>
@@ -72,11 +72,11 @@ Although release versions of **BlenderNeRF** are available for download, they ar
 
 The add-on properties panel is available under `3D View > N panel > BlenderNeRF` (the **N panel** is accessible under the 3D viewport when pressing `N`). All 3 methods (**SOF**, **TTC** and **COS**) share a common tab called `BlenderNeRF shared UI` with the below listed controllable properties.
 
-* `Train` (activated by default) : whether to register training data (renderings + camera information)
-* `Val` (activated by default) : whether to register validation camera information
-* `Test` (activated by default) : whether to register testing data (camera information only)
+* `Train` (activated by default) : whether to render training images and save camera information
+* `Val` (activated by default) : whether to render validation images and save camera information
+* `Test` (activated by default) : whether to render test images and save camera information
 * `AABB` (by default set to **4**) : aabb scale parameter as described in Instant NGP (more details below)
-* `Use Transparent Background` (deactivated by default) : whether rendered training images should have a transparent background; otherwise, the background is white. Transparent renders are saved as RGBA PNGs.
+* `Use Transparent Background` (deactivated by default) : whether rendered dataset images should have a transparent background; otherwise, the background is white. Transparent renders are saved as RGBA PNGs.
 * `Save Log File` (deactivated by default) : whether to save a log file containing reproducibility information on the **BlenderNeRF** run
 * `File Format` (**NGP** by default) : whether to export the camera files in the Instant NGP or defaut NeRF file format convention
 * `Gaussian Points` (deactivated by default) : whether to export a `points3d.ply` file for Gaussian Splatting
@@ -85,7 +85,7 @@ The add-on properties panel is available under `3D View > N panel > BlenderNeRF`
 
 If the `Gaussian Points` property is active, **BlenderNeRF** will create an additional `points3d.ply` file from all visible meshes (at render time) where each vertex will be used as initialization point. Vertex colors will be stored if available, and set to black otherwise.
 
-The [**Gaussian Splatting**](https://github.com/graphdeco-inria/gaussian-splatting) repository natively supports **NeRF** datasets, but requires both train and test data. The `Dummy` option for the `Gaussian Test Camera Poses` property creates an empty test camera pose file, in the case no test images are needed. The `Full` option exports the default test camera poses, but will require separately rendering a `test` folder containing all the test renders.
+The [**Gaussian Splatting**](https://github.com/graphdeco-inria/gaussian-splatting) repository natively supports **NeRF** datasets, but requires both train and test data. The `Dummy` option for the `Gaussian Test Camera Poses` property creates an empty test camera pose file and skips test-image rendering. The `Full` option exports the default test camera poses and renders the corresponding images to the `test/` folder.
 
 `AABB` is restricted to be an integer power of 2, it defines the side length of the bounding box volume in which NeRF will trace rays. The property was introduced with **NVIDIA's [Instant NGP](https://github.com/NVlabs/instant-ngp)** version of NeRF.
 

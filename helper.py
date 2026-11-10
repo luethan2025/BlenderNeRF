@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import random
@@ -332,6 +333,24 @@ def restore_render_background(scene):
         bpy.data.worlds.remove(scene.init_render_world_temp)
     scene.init_render_world_temp = None
 
+def start_next_render(scene):
+    render_queue = json.loads(scene.render_queue)
+    if not render_queue:
+        return
+
+    render_pass = render_queue.pop(0)
+    scene.render_queue = json.dumps(render_queue) if render_queue else ''
+    scene.camera = scene.objects[render_pass['camera']]
+    scene.frame_step = render_pass['frame_step']
+    scene.frame_end = render_pass['frame_end']
+    scene.render.filepath = os.path.join(render_pass['directory'], '')
+    os.makedirs(render_pass['directory'], exist_ok=True)
+    bpy.ops.render.render('INVOKE_DEFAULT', animation=True, write_still=True)
+
+def start_render_queue(scene, render_queue):
+    scene.render_queue = json.dumps(render_queue)
+    start_next_render(scene)
+
 def empty_fn(self, context): pass
 
 can_scene_upd = properties_ui
@@ -353,28 +372,31 @@ def upd_on():
 @persistent
 def post_render(scene):
     if any(scene.rendering): # execute this function only when rendering with addon
+        if scene.render_queue:
+            bpy.app.timers.register(lambda: start_next_render(scene), first_interval=0.1)
+            return
+
         dataset_names = (scene.sof_dataset_name, scene.ttc_dataset_name, scene.cos_dataset_name)
         method_dataset_name = dataset_names[ list(scene.rendering).index(True) ]
 
-        if scene.rendering[0]: scene.frame_step = scene.init_frame_step # sof : reset frame step
-
-        if scene.rendering[1]: # ttc : reset frame end
-            scene.frame_end = scene.init_frame_end
+        scene.frame_step = scene.init_frame_step
+        scene.frame_end = scene.init_frame_end
 
         if scene.rendering[2]: # cos : reset camera settings
             restore_center_crop(scene)
             restore_cos_brightness()
-            if not scene.init_camera_exists: delete_camera(scene, CAMERA_NAME)
-            if not scene.init_sphere_exists:
+            if not scene.init_camera_exists and CAMERA_NAME in scene.objects.keys():
+                delete_camera(scene, CAMERA_NAME)
+            if not scene.init_sphere_exists and EMPTY_NAME in scene.objects.keys():
                 objects = bpy.data.objects
                 objects.remove(objects[EMPTY_NAME], do_unlink=True)
                 scene.show_sphere = False
                 scene.sphere_exists = False
 
-            scene.camera = scene.init_active_camera
-            scene.frame_end = scene.init_frame_end
+        scene.camera = scene.init_active_camera
 
         scene.rendering = (False, False, False)
+        scene.render_queue = ''
         scene.render.filepath = scene.init_output_path # reset filepath
         restore_render_background(scene)
 
@@ -385,6 +407,12 @@ def post_render(scene):
         # compress dataset and remove folder (only keep zip)
         shutil.make_archive(output_path, 'zip', output_path) # output filename = output_path
         shutil.rmtree(output_path)
+
+@persistent
+def cancel_render(scene):
+    if any(scene.rendering):
+        scene.render_queue = ''
+        post_render(scene)
 
 # set initial property values (bpy.data and bpy.context require a loaded scene)
 @persistent

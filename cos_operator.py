@@ -52,19 +52,34 @@ class CameraOnSphere(blender_nerf_operator.BlenderNeRF_Operator):
         # other intial properties
         scene.init_sphere_exists = scene.show_sphere
         scene.init_camera_exists = scene.show_camera
+        scene.init_frame_step = scene.frame_step
         scene.init_frame_end = scene.frame_end
         scene.init_active_camera = camera
+        render_queue = []
 
         if scene.test_data:
             # testing transforms
             output_data['frames'] = self.get_camera_extrinsics(scene, camera, mode='TEST', method='COS')
             self.save_json(output_path, 'transforms_test.json', output_data)
+            if not (scene.splats and scene.splats_test_dummy):
+                render_queue.append({
+                    'camera': camera.name,
+                    'directory': os.path.join(output_path, 'test'),
+                    'frame_end': scene.frame_end,
+                    'frame_step': scene.frame_step
+                })
 
         if scene.val_data:
             # validation transforms
             output_val_data = self.get_camera_intrinsics(scene, camera, crop_size=800)
             output_val_data['frames'] = self.get_camera_extrinsics(scene, camera, mode='VAL', method='COS')
             self.save_json(output_path, 'transforms_val.json', output_val_data)
+            render_queue.append({
+                'camera': camera.name,
+                'directory': os.path.join(output_path, 'val'),
+                'frame_end': scene.frame_end,
+                'frame_step': scene.frame_step
+            })
 
         if scene.train_data:
             if not scene.show_camera: scene.show_camera = True
@@ -78,31 +93,22 @@ class CameraOnSphere(blender_nerf_operator.BlenderNeRF_Operator):
             sphere_output_data['frames'] = self.get_camera_extrinsics(scene, sphere_camera, mode='TRAIN', method='COS')
             self.save_json(output_path, 'transforms_train.json', sphere_output_data)
 
-            # rendering
-            output_train = os.path.join(output_path, 'train')
-            os.makedirs(output_train, exist_ok=True)
+            render_queue.append({
+                'camera': sphere_camera.name,
+                'directory': os.path.join(output_path, 'train'),
+                'frame_end': scene.frame_start + scene.cos_nb_frames - 1,
+                'frame_step': scene.frame_step
+            })
+
+        if render_queue:
             if not helper.set_center_crop(scene, crop_size=800):
                 self.report({'ERROR'}, 'COS images must be rendered at least 800x800 to apply center crop.')
                 return {'FINISHED'}
             helper.apply_cos_brightness(scene)
             scene.rendering = (False, False, True)
-            scene.frame_end = scene.frame_start + scene.cos_nb_frames - 1 # update end frame
-            scene.render.filepath = os.path.join(output_train, '') # training frames path
             helper.set_render_background(scene)
-            bpy.ops.render.render('INVOKE_DEFAULT', animation=True, write_still=True) # render scene
-
-        # if frames are rendered, the below code is executed by the handler function
-        if not any(scene.rendering):
-            # reset camera settings
-            if not scene.init_camera_exists: helper.delete_camera(scene, CAMERA_NAME)
-            if not scene.init_sphere_exists:
-                objects = bpy.data.objects
-                objects.remove(objects[EMPTY_NAME], do_unlink=True)
-                scene.show_sphere = False
-                scene.sphere_exists = False
-
-            scene.camera = scene.init_active_camera
-
+            helper.start_render_queue(scene, render_queue)
+        else:
             # compress dataset and remove folder (only keep zip)
             shutil.make_archive(output_path, 'zip', output_path) # output filename = output_path
             shutil.rmtree(output_path)

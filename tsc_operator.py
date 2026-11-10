@@ -36,34 +36,51 @@ class TrainValTestCameras(blender_nerf_operator.BlenderNeRF_Operator):
 
         # initial properties might have changed since set_init_props update
         scene.init_output_path = scene.render.filepath
+        scene.init_frame_step = scene.frame_step
         scene.init_frame_end = scene.frame_end
+        scene.init_active_camera = scene.camera
+        render_queue = []
 
         if scene.test_data:
             # testing transforms
             output_test_data['frames'] = self.get_camera_extrinsics(scene, test_camera, mode='TEST', method='TTC')
             self.save_json(output_path, 'transforms_test.json', output_test_data)
+            if not (scene.splats and scene.splats_test_dummy):
+                render_queue.append({
+                    'camera': test_camera.name,
+                    'directory': os.path.join(output_path, 'test'),
+                    'frame_end': scene.frame_end,
+                    'frame_step': scene.frame_step
+                })
 
         if scene.val_data:
             # validation transforms
             output_val_data['frames'] = self.get_camera_extrinsics(scene, val_camera, mode='VAL', method='TTC')
             self.save_json(output_path, 'transforms_val.json', output_val_data)
+            render_queue.append({
+                'camera': val_camera.name,
+                'directory': os.path.join(output_path, 'val'),
+                'frame_end': scene.frame_end,
+                'frame_step': scene.frame_step
+            })
 
         if scene.train_data:
             # training transforms
             output_train_data['frames'] = self.get_camera_extrinsics(scene, train_camera, mode='TRAIN', method='TTC')
             self.save_json(output_path, 'transforms_train.json', output_train_data)
 
-            # rendering
-            output_train = os.path.join(output_path, 'train')
-            os.makedirs(output_train, exist_ok=True)
-            scene.rendering = (False, True, False)
-            scene.frame_end = scene.frame_start + scene.ttc_nb_frames - 1 # update end frame
-            scene.render.filepath = os.path.join(output_train, '') # training frames path
-            helper.set_render_background(scene)
-            bpy.ops.render.render('INVOKE_DEFAULT', animation=True, write_still=True) # render scene
+            render_queue.append({
+                'camera': train_camera.name,
+                'directory': os.path.join(output_path, 'train'),
+                'frame_end': scene.frame_start + scene.ttc_nb_frames - 1,
+                'frame_step': scene.frame_step
+            })
 
-        # if frames are rendered, the below code is executed by the handler function
-        if not any(scene.rendering):
+        if render_queue:
+            scene.rendering = (False, True, False)
+            helper.set_render_background(scene)
+            helper.start_render_queue(scene, render_queue)
+        else:
             # compress dataset and remove folder (only keep zip)
             shutil.make_archive(output_path, 'zip', output_path) # output filename = output_path
             shutil.rmtree(output_path)

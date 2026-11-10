@@ -77,7 +77,7 @@ The add-on properties panel is available under `3D View > N panel > BlenderNeRF`
 * `Test` (activated by default) : whether to render test images and save camera information
 * `AABB` (by default set to **4**) : aabb scale parameter as described in Instant NGP (more details below)
 * `Use Transparent Background` (deactivated by default) : whether rendered dataset images should have a transparent background; otherwise, the background is white. Transparent renders are saved as RGBA PNGs.
-* `Save Log File` (deactivated by default) : whether to save a log file containing reproducibility information on the **BlenderNeRF** run
+* `Save Log File` (activated by default) : whether to save a log file containing reproducibility information on the **BlenderNeRF** run
 * `File Format` (**NGP** by default) : whether to export the camera files in the Instant NGP or defaut NeRF file format convention
 * `Gaussian Points` (deactivated by default) : whether to export a `points3d.ply` file for Gaussian Splatting
 * `Gaussian Test Camera Poses` (**Dummy** by default): whether to export a dummy test camera file or the full set of test camera poses (only with `Gaussian Points`)
